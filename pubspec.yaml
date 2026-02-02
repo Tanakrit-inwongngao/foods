@@ -1,0 +1,43 @@
+name: food_detector_app
+description: A Thai food detector app using Flutter + Flask backend + Roboflow + Realtime Chat
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # ติดต่อ Flask / Roboflow API
+  http: ^1.5.0
+
+  # เลือกรูปจากกล้อง / แกลเลอรี่
+  image_picker: ^1.0.8
+  image_picker_for_web: ^3.0.1
+
+  # เก็บข้อมูลผู้ใช้, โปรไฟล์, ประวัติ
+  shared_preferences: ^2.3.1
+
+  # จัดการรูปภาพ
+  image: ^4.2.0
+
+  # WebSocket สำหรับแชทแบบเรียลไทม์ (เวอร์ชันล่าสุดที่รองรับ Flutter >=3.2)
+  socket_io_client: ^2.0.0-nullsafety.0
+
+  # UI แชท
+  flutter_chat_ui: ^1.6.15
+  flutter_chat_types: ^3.5.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/

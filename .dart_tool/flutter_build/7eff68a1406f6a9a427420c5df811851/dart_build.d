@@ -1,0 +1,1 @@
+ D:\\66020789\\food_detector_app\\frontend_new\\.dart_tool\\flutter_build\\7eff68a1406f6a9a427420c5df811851\\dart_build_result.json: 
