@@ -152,6 +152,12 @@
       "languageVersion": "3.8"
     },
     {
+      "name": "flutter_localizations",
+      "rootUri": "file:///D:/66020789/flutter/packages/flutter_localizations",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
       "name": "flutter_parsed_text",
       "rootUri": "file:///C:/Users/pooh0/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_parsed_text-2.2.1",
       "packageUri": "lib/",
@@ -174,6 +180,12 @@
       "rootUri": "file:///D:/66020789/flutter/packages/flutter_web_plugins",
       "packageUri": "lib/",
       "languageVersion": "3.8"
+    },
+    {
+      "name": "google_fonts",
+      "rootUri": "file:///C:/Users/pooh0/AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
     },
     {
       "name": "html",
@@ -330,6 +342,24 @@
       "rootUri": "file:///C:/Users/pooh0/AppData/Local/Pub/Cache/hosted/pub.dev/path-1.9.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "path_provider",
+      "rootUri": "file:///C:/Users/pooh0/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider-2.1.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "path_provider_android",
+      "rootUri": "file:///C:/Users/pooh0/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.22",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
+      "name": "path_provider_foundation",
+      "rootUri": "file:///C:/Users/pooh0/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_foundation-2.5.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
     },
     {
       "name": "path_provider_linux",

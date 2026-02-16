@@ -1,189 +1,138 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
-import '../services/user_service.dart';
+import '../services/history_store.dart';
 
-class HistoryPage extends StatefulWidget {
+class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
 
-  @override
-  State<HistoryPage> createState() => _HistoryPageState();
-}
-
-class _HistoryPageState extends State<HistoryPage> {
-  List<Map<String, dynamic>> _history = [];
-  bool loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    loadHistory();
+  Uint8List? _tryDecodeImage(String? base64Str) {
+    if (base64Str == null || base64Str.isEmpty) return null;
+    try {
+      return base64Decode(base64Str);
+    } catch (_) {
+      return null;
+    }
   }
 
-  // ===============================
-  // LOAD HISTORY (LOCAL)
-  // ===============================
-  Future<void> loadHistory() async {
-    final data = await UserService.loadHistory();
-    setState(() {
-      _history = data;
-      loading = false;
-    });
+  String _ingredientsToText(dynamic ingredients) {
+    if (ingredients == null) return '-';
+    if (ingredients is String) return ingredients;
+    if (ingredients is List) return ingredients.map((e) => e.toString()).join(', ');
+    return ingredients.toString();
   }
 
-  // ===============================
-  // CLEAR HISTORY
-  // ===============================
-  Future<void> clearHistory() async {
-    await UserService.clearHistory();
-    await loadHistory();
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("ล้างประวัติเรียบร้อยแล้ว")),
-    );
-  }
-
-  // ===============================
-  // UI
-  // ===============================
   @override
   Widget build(BuildContext context) {
+    final history = HistoryStore.items;
+
     return Scaffold(
-      backgroundColor: Colors.orange.shade50,
       appBar: AppBar(
-        title: const Text("📜 ประวัติการตรวจจับอาหาร"),
-        backgroundColor: Colors.orange,
-        actions: [
-          // 🔄 REFRESH BUTTON
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: "รีเฟรช",
-            onPressed: () {
-              setState(() => loading = true);
-              loadHistory();
-            },
-          ),
-          // 🗑️ CLEAR HISTORY
-          IconButton(
-            icon: const Icon(Icons.delete_forever),
-            tooltip: "ล้างประวัติ",
-            onPressed: clearHistory,
-          ),
-        ],
+        title: const Text('ประวัติ'),
       ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-        onRefresh: loadHistory,
-        child: _history.isEmpty
-            ? ListView(
-          children: const [
-            SizedBox(height: 200),
-            Center(
-              child: Text(
-                "ยังไม่มีประวัติการตรวจจับ",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ],
-        )
-            : ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          itemCount: _history.length,
-          itemBuilder: (context, index) {
-            final item = _history[index];
+      body: history.isEmpty
+          ? const Center(child: Text('ยังไม่มีประวัติ'))
+          : ListView.separated(
+        padding: const EdgeInsets.all(12),
+        itemCount: history.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        itemBuilder: (context, index) {
+          final item = history[index];
 
-            Uint8List? image;
-            if (item['image_base64'] != null) {
-              try {
-                image = base64Decode(item['image_base64']);
-              } catch (_) {}
-            }
+          final String title = (item['title'] ??
+              item['food_name_th'] ??
+              item['food_name_en'] ??
+              'รายการอาหาร')
+              .toString();
 
-            return Card(
-              margin: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // IMAGE
+          final calories = item['calories'];
+          final confidence = item['confidence'];
+          final ingredientsText = _ingredientsToText(item['ingredients']);
+
+          final imgBytes = _tryDecodeImage(
+            (item['imageBase64'] ?? item['image_base64'])?.toString(),
+          );
+
+          return Card(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (imgBytes != null)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: image != null
-                          ? Image.memory(
-                        image,
-                        width: 70,
-                        height: 70,
+                      child: Image.memory(
+                        imgBytes,
+                        width: 90,
+                        height: 90,
                         fit: BoxFit.cover,
-                      )
-                          : Container(
-                        width: 70,
-                        height: 70,
-                        color: Colors.grey.shade300,
-                        child: const Icon(Icons.fastfood),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    // INFO
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item['food_name_th'] ?? '-',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '🔥 ${item['calories']} kcal',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.deepOrange,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '🥩 โปรตีน ${item['protein_g']}g | '
-                                '🧈 ไขมัน ${item['fat_g']}g | '
-                                '🍚 คาร์บ ${item['carbs_g']}g',
-                            style:
-                            const TextStyle(fontSize: 13),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            '🍴 วัตถุดิบ: ${item['ingredients'] ?? "-"}',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.black87,
-                              height: 1.4,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                    )
+                  else
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.black12,
                       ),
+                      child: const Icon(Icons.image_not_supported),
                     ),
-                  ],
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 6,
+                          children: [
+                            if (calories != null)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.local_fire_department, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text('${calories.toString()} kcal'),
+                                ],
+                              ),
+                            if (confidence != null)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.verified, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text('Confidence: ${confidence.toString()}%'),
+                                ],
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'ส่วนประกอบ: $ingredientsText',
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

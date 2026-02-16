@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'services/auth_service.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/history_page.dart';
 import 'pages/profile_page.dart';
-import 'pages/login_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,50 +20,37 @@ class FoodDetectorApp extends StatelessWidget {
     return MaterialApp(
       title: "🍜 Thai Food Detector",
       debugShowCheckedModeBanner: false,
+      // ✅ รองรับภาษาไทย (Material/Cupertino) + ตั้ง locale เริ่มต้นเป็นไทย
+      locale: const Locale('th', 'TH'),
+      supportedLocales: const [
+        Locale('th', 'TH'),
+        Locale('en', 'US'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      // ✅ บังคับฟอนต์ที่รองรับไทยทั้งแอป (รวม TextField/AlertDialog)
       theme: ThemeData(
-        primarySwatch: Colors.orange,
         useMaterial3: true,
+        colorSchemeSeed: Colors.orange,
+        textTheme: GoogleFonts.sarabunTextTheme(),
       ),
+
+      // ✅ เปิดแอปมาให้เริ่มที่หน้า Login ก่อนเสมอ
       initialRoute: '/',
       routes: {
-        '/': (_) => const SplashPage(),
-        '/login': (_) => const LoginPage(),
+        '/': (_) => LoginPage(),
+        '/login': (_) => LoginPage(),
+
+        // เผื่ออยากใช้ named route แทน push(MaterialPageRoute)
+        '/home': (_) => HomePage(),
+
+        // หน้าหลักแบบ Bottom Navigation (ถ้าคุณอยากใช้)
         '/main': (_) => const MainPage(),
       },
-    );
-  }
-}
-
-/* ================= SPLASH / AUTH CHECK ================= */
-
-class SplashPage extends StatefulWidget {
-  const SplashPage({super.key});
-
-  @override
-  State<SplashPage> createState() => _SplashPageState();
-}
-
-class _SplashPageState extends State<SplashPage> {
-  @override
-  void initState() {
-    super.initState();
-    _checkAuth();
-  }
-
-  Future<void> _checkAuth() async {
-    final user = await AuthService.me();
-    if (!mounted) return;
-
-    Navigator.pushReplacementNamed(
-      context,
-      user == null ? '/login' : '/main',
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
     );
   }
 }
@@ -78,7 +67,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
+  final List<Widget> _pages = [
     HomePage(),
     HistoryPage(),
     ProfilePage(),

@@ -9,23 +9,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  flutter_localizations:
+    sdk: flutter
   cupertino_icons: ^1.0.8
+
+  # ฟอนต์ที่รองรับภาษาไทย (แนะนำ)
+  google_fonts: ^6.2.1
 
   # ติดต่อ Flask / Roboflow API
   http: ^1.5.0
+
+  # เก็บข้อมูลผู้ใช้, โปรไฟล์, ประวัติ
+  shared_preferences: ^2.3.1
 
   # เลือกรูปจากกล้อง / แกลเลอรี่
   image_picker: ^1.0.8
   image_picker_for_web: ^3.0.1
 
-  # เก็บข้อมูลผู้ใช้, โปรไฟล์, ประวัติ
-  shared_preferences: ^2.3.1
-
   # จัดการรูปภาพ
   image: ^4.2.0
 
-  # WebSocket สำหรับแชทแบบเรียลไทม์ (เวอร์ชันล่าสุดที่รองรับ Flutter >=3.2)
+  # WebSocket สำหรับแชทแบบเรียลไทม์
   socket_io_client: ^2.0.0-nullsafety.0
 
   # UI แชท
